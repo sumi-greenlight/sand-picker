@@ -12,6 +12,12 @@ const VALID_CODES = [
 (() => {
   'use strict';
 
+  // Apply saved mode (or default light) immediately so auth gate looks right
+  const savedMode = localStorage.getItem('sandpicker_mode') || 'light';
+  const savedPalette = localStorage.getItem('sandpicker_palette') || 'beige';
+  document.documentElement.setAttribute('data-mode', savedMode);
+  document.documentElement.setAttribute('data-palette', savedPalette);
+
   const SESSION_KEY = 'sandpicker_auth';
   const authGate = document.getElementById('authGate');
   const appContainer = document.getElementById('appContainer');
