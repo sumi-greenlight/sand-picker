@@ -6,7 +6,7 @@
   <title>Sand Picker</title>
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
 </head>
 <body>
 
@@ -14,10 +14,13 @@
   <div id="authGate" class="auth-gate">
     <div class="auth-card glass-panel">
       <h1 class="auth-logo">Sand Picker</h1>
-      <p class="auth-subtitle">Sign in with your Vendasta account to continue</p>
-      <div id="googleSignInBtn" class="google-btn-wrap"></div>
+      <p class="auth-subtitle">Enter the access code to continue</p>
+      <div class="auth-input-group">
+        <input type="password" id="passwordInput" class="glass-input auth-password" placeholder="Access code..." autocomplete="off">
+        <button id="authSubmit" class="glass-btn primary">Enter</button>
+      </div>
       <p id="authError" class="auth-error hidden"></p>
-      <p class="auth-footer">Restricted to @vendasta.com</p>
+      <p class="auth-footer">Ask your team lead for the access code</p>
     </div>
   </div>
 
@@ -27,9 +30,9 @@
     <aside class="sidebar glass-panel">
       <div class="sidebar-header">
         <h1 class="logo">Sand Picker</h1>
-        <button id="signOutBtn" class="glass-btn small sign-out-btn" title="Sign out">Sign out</button>
+        <button id="signOutBtn" class="glass-btn small sign-out-btn" title="Lock">Lock</button>
       </div>
-      <p class="subtitle" id="userGreeting">Add names, then watch the sand decide</p>
+      <p class="subtitle">Add names, then watch the sand decide</p>
 
       <div class="input-group">
         <input type="text" id="itemInput" class="glass-input" placeholder="Add a name..." autocomplete="off">
