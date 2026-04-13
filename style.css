@@ -770,11 +770,29 @@ html, body {
   margin-bottom: 8px;
 }
 
-.google-btn-wrap {
-  min-height: 44px;
+.auth-input-group {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.auth-password {
+  flex: 1;
+  text-align: center;
+  font-size: 15px;
+  letter-spacing: 1px;
+}
+
+.auth-password.shake {
+  animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(6px); }
 }
 
 .auth-error {
