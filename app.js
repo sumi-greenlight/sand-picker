@@ -140,7 +140,7 @@
   };
 
   let currentPalette = localStorage.getItem('sandpicker_palette') || 'beige';
-  let currentMode = localStorage.getItem('sandpicker_mode') || 'dark';
+  let currentMode = localStorage.getItem('sandpicker_mode') || 'light';
   let isDark = currentMode === 'dark';
 
   function getPalette() {
