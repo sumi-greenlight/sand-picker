@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sand Picker</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+
+  <!-- Auth Gate -->
+  <div id="authGate" class="auth-gate">
+    <div class="auth-card glass-panel">
+      <h1 class="auth-logo">Sand Picker</h1>
+      <p class="auth-subtitle">Sign in with your Vendasta account to continue</p>
+      <div id="googleSignInBtn" class="google-btn-wrap"></div>
+      <p id="authError" class="auth-error hidden"></p>
+      <p class="auth-footer">Restricted to @vendasta.com</p>
+    </div>
+  </div>
+
+  <!-- App (hidden until auth) -->
+  <div id="appContainer" class="app hidden">
+    <!-- Sidebar -->
+    <aside class="sidebar glass-panel">
+      <div class="sidebar-header">
+        <h1 class="logo">Sand Picker</h1>
+        <button id="signOutBtn" class="glass-btn small sign-out-btn" title="Sign out">Sign out</button>
+      </div>
+      <p class="subtitle" id="userGreeting">Add names, then watch the sand decide</p>
+
+      <div class="input-group">
+        <input type="text" id="itemInput" class="glass-input" placeholder="Add a name..." autocomplete="off">
+        <button id="addBtn" class="glass-btn primary">Add</button>
+      </div>
+
+      <div class="bulk-toggle">
+        <button id="bulkToggle" class="glass-btn secondary small">Paste multiple</button>
+      </div>
+
+      <div id="bulkArea" class="bulk-area hidden">
+        <textarea id="bulkInput" class="glass-input" placeholder="One name per line..." rows="4"></textarea>
+        <button id="bulkAddBtn" class="glass-btn primary small">Add all</button>
+      </div>
+
+      <div class="items-header">
+        <span id="itemCount">0 names</span>
+        <button id="clearBtn" class="glass-btn danger small">Clear all</button>
+      </div>
+
+      <ul id="itemList" class="item-list"></ul>
+
+      <div class="options">
+        <label class="glass-checkbox">
+          <input type="checkbox" id="removeWinner">
+          <span class="checkmark"></span>
+          Remove winner after pick
+        </label>
+      </div>
+
+      <div class="palette-picker">
+        <div class="palette-row">
+          <span class="palette-label">Theme</span>
+          <button class="mode-toggle glass-btn small" id="modeToggle" title="Toggle light/dark mode">
+            <span class="mode-icon" id="modeIcon">&#9790;</span>
+          </button>
+        </div>
+        <div class="palette-swatches" id="palettePicker">
+          <button class="swatch active" data-palette="beige" title="Beige"><span style="background:#c8b898"></span></button>
+          <button class="swatch" data-palette="rose" title="Rose Gold"><span style="background:#e8a0b4"></span></button>
+          <button class="swatch" data-palette="ocean" title="Ocean"><span style="background:#4fc3f7"></span></button>
+          <button class="swatch" data-palette="aurora" title="Aurora"><span style="background:#bf5af2"></span></button>
+          <button class="swatch" data-palette="mint" title="Mint"><span style="background:#82ddb0"></span></button>
+          <button class="swatch" data-palette="mono" title="Mono"><span style="background:#a0a0a0"></span></button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main canvas area -->
+    <main class="canvas-stage">
+      <canvas id="sandCanvas"></canvas>
+      <div id="countdownOverlay" class="countdown-overlay hidden"></div>
+      <button id="goBtn" class="go-button glass-btn">GO</button>
+      <button id="resetBtn" class="reset-button glass-btn secondary hidden">Reset</button>
+    </main>
+  </div>
+
+  <script src="auth.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
