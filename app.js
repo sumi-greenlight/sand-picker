@@ -3,7 +3,7 @@
 
   // ===== State =====
   const STORAGE_KEY = 'sandpicker_items';
-  const DEFAULT_ITEMS = ['Alice', 'Bob', 'Charlie', 'Diana', 'Eve', 'Frank'];
+  const DEFAULT_ITEMS = [];
   let items = loadItems();
   let particles = [];
   let confettiPieces = [];
