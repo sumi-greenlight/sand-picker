@@ -472,6 +472,167 @@ html, body {
   color: var(--danger);
 }
 
+/* ===== Nearby Places ===== */
+.nearby-toggle {
+  display: flex;
+}
+
+.nearby-area {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nearby-controls {
+  display: flex;
+  gap: 6px;
+}
+
+.glass-select {
+  flex: 1;
+  padding: 7px 8px;
+  font-size: 12px;
+  font-family: var(--font);
+  color: var(--text-primary);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xs);
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236e6e73'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 22px;
+}
+
+.glass-select:focus {
+  border-color: rgba(var(--accent-rgb), 0.5);
+  box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.1);
+}
+
+.glass-select option {
+  background: #1a1a1a;
+  color: #f5f5f7;
+}
+
+[data-mode="light"] .glass-select option {
+  background: #fff;
+  color: #1d1d1f;
+}
+
+[data-mode="light"] .glass-select {
+  background-color: rgba(255, 255, 255, 0.6);
+  color: #1d1d1f;
+}
+
+.locate-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.locate-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.nearby-status {
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 4px 0;
+}
+
+.nearby-status.error {
+  color: var(--danger);
+}
+
+.nearby-results {
+  list-style: none;
+  max-height: 160px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.nearby-results::-webkit-scrollbar {
+  width: 4px;
+}
+
+.nearby-results::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.nearby-results li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  font-size: 13px;
+  background: var(--glass-bg);
+  border-radius: var(--radius-xs);
+  border: 1px solid transparent;
+  transition: all 0.15s;
+  gap: 8px;
+}
+
+.nearby-results li:hover {
+  border-color: var(--glass-border);
+  background: var(--surface-hover);
+}
+
+.nearby-results li .place-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nearby-results li .add-place-btn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 18px;
+  padding: 0 4px;
+  border-radius: 4px;
+  transition: all 0.15s;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.nearby-results li .add-place-btn:hover {
+  background: rgba(var(--accent-rgb), 0.12);
+}
+
+.nearby-results li.added {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.nearby-results li.added .add-place-btn::after {
+  content: '✓';
+  color: var(--accent);
+}
+
+[data-mode="light"] .nearby-results li {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+[data-mode="light"] .nearby-results li:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+[data-mode="light"] .nearby-results::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+}
+
 /* ===== Options ===== */
 .options {
   padding-top: 10px;

@@ -834,6 +834,149 @@
     applyMode(isDark ? 'light' : 'dark');
   });
 
+  // ===== Nearby Places (Overpass API) =====
+  const nearbyToggle = document.getElementById('nearbyToggle');
+  const nearbyArea = document.getElementById('nearbyArea');
+  const locateBtn = document.getElementById('locateBtn');
+  const nearbyStatus = document.getElementById('nearbyStatus');
+  const nearbyResults = document.getElementById('nearbyResults');
+  const addAllNearby = document.getElementById('addAllNearby');
+  const placeType = document.getElementById('placeType');
+  const placeRadius = document.getElementById('placeRadius');
+  const placeLimit = document.getElementById('placeLimit');
+
+  const OVERPASS_URL = 'https://overpass-api.de/api/interpreter';
+
+  nearbyToggle.addEventListener('click', () => {
+    nearbyArea.classList.toggle('hidden');
+    nearbyToggle.textContent = nearbyArea.classList.contains('hidden')
+      ? 'Find nearby places' : 'Hide places';
+  });
+
+  function setNearbyStatus(msg, isError = false) {
+    nearbyStatus.textContent = msg;
+    nearbyStatus.classList.remove('hidden', 'error');
+    if (isError) nearbyStatus.classList.add('error');
+  }
+
+  function hideNearbyStatus() {
+    nearbyStatus.classList.add('hidden');
+  }
+
+  locateBtn.addEventListener('click', () => {
+    if (!('geolocation' in navigator)) {
+      setNearbyStatus('Geolocation not supported by your browser.', true);
+      return;
+    }
+
+    setNearbyStatus('Getting your location...');
+    locateBtn.disabled = true;
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        setNearbyStatus('Searching nearby places...');
+        searchNearbyPlaces(lat, lng);
+      },
+      (err) => {
+        locateBtn.disabled = false;
+        if (err.code === 1) {
+          setNearbyStatus('Location permission denied. Please allow access.', true);
+        } else {
+          setNearbyStatus('Could not get location. Try again.', true);
+        }
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  });
+
+  async function searchNearbyPlaces(lat, lng) {
+    const type = placeType.value;
+    const radius = placeRadius.value;
+    const limit = parseInt(placeLimit.value, 10);
+
+    const query = `[out:json][timeout:10];
+(
+  node(around:${radius},${lat},${lng})["amenity"="${type}"]["name"];
+  way(around:${radius},${lat},${lng})["amenity"="${type}"]["name"];
+);
+out center body qt ${limit};`;
+
+    try {
+      const resp = await fetch(OVERPASS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'data=' + encodeURIComponent(query),
+      });
+
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+      const data = await resp.json();
+      const places = (data.elements || [])
+        .map(el => el.tags?.name)
+        .filter(Boolean)
+        .slice(0, limit);
+
+      locateBtn.disabled = false;
+
+      if (places.length === 0) {
+        setNearbyStatus(`No ${placeType.options[placeType.selectedIndex].text.toLowerCase()} found nearby. Try a larger radius.`, true);
+        nearbyResults.classList.add('hidden');
+        addAllNearby.classList.add('hidden');
+        return;
+      }
+
+      setNearbyStatus(`Found ${places.length} places`);
+      renderNearbyResults(places);
+    } catch (err) {
+      locateBtn.disabled = false;
+      console.error('Overpass error:', err);
+      setNearbyStatus('Search failed. Try again in a moment.', true);
+    }
+  }
+
+  function renderNearbyResults(places) {
+    nearbyResults.innerHTML = '';
+    nearbyResults.classList.remove('hidden');
+    addAllNearby.classList.remove('hidden');
+
+    places.forEach((name, i) => {
+      const li = document.createElement('li');
+      li.dataset.place = name;
+
+      const span = document.createElement('span');
+      span.className = 'place-name';
+      span.textContent = name;
+
+      const btn = document.createElement('button');
+      btn.className = 'add-place-btn';
+      btn.innerHTML = '+';
+      btn.title = 'Add to list';
+      btn.addEventListener('click', () => {
+        addItem(name);
+        li.classList.add('added');
+        btn.innerHTML = '';
+      });
+
+      li.appendChild(span);
+      li.appendChild(btn);
+      nearbyResults.appendChild(li);
+    });
+  }
+
+  addAllNearby.addEventListener('click', () => {
+    const placeItems = nearbyResults.querySelectorAll('li:not(.added)');
+    placeItems.forEach(li => {
+      addItem(li.dataset.place);
+      li.classList.add('added');
+      li.querySelector('.add-place-btn').innerHTML = '';
+    });
+    if (placeItems.length > 0) {
+      setNearbyStatus(`Added ${placeItems.length} places to the list!`);
+    }
+  });
+
   // ===== Resize =====
   let resizeTimer;
   window.addEventListener('resize', () => {

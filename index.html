@@ -48,6 +48,40 @@
         <button id="bulkAddBtn" class="glass-btn primary small">Add all</button>
       </div>
 
+      <div class="nearby-toggle">
+        <button id="nearbyToggle" class="glass-btn secondary small">Find nearby places</button>
+      </div>
+
+      <div id="nearbyArea" class="nearby-area hidden">
+        <div class="nearby-controls">
+          <select id="placeType" class="glass-select">
+            <option value="restaurant">Restaurants</option>
+            <option value="cafe">Cafes</option>
+            <option value="bar">Bars</option>
+            <option value="fast_food">Fast Food</option>
+            <option value="pub">Pubs</option>
+            <option value="ice_cream">Ice Cream</option>
+          </select>
+          <select id="placeRadius" class="glass-select">
+            <option value="500">500m</option>
+            <option value="1000" selected>1 km</option>
+            <option value="2000">2 km</option>
+            <option value="5000">5 km</option>
+          </select>
+          <select id="placeLimit" class="glass-select">
+            <option value="10">Top 10</option>
+            <option value="20" selected>Top 20</option>
+            <option value="50">Top 50</option>
+          </select>
+        </div>
+        <button id="locateBtn" class="glass-btn primary small locate-btn">
+          <span class="locate-icon">&#9737;</span> Use my location
+        </button>
+        <p id="nearbyStatus" class="nearby-status hidden"></p>
+        <ul id="nearbyResults" class="nearby-results hidden"></ul>
+        <button id="addAllNearby" class="glass-btn primary small hidden">Add all to list</button>
+      </div>
+
       <div class="items-header">
         <span id="itemCount">0 names</span>
         <button id="clearBtn" class="glass-btn danger small">Clear all</button>
