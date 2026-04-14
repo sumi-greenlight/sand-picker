@@ -852,6 +852,11 @@
     'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
   ];
 
+  const locationInput = document.getElementById('locationInput');
+  const searchLocationBtn = document.getElementById('searchLocationBtn');
+
+  const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
+
   nearbyToggle.addEventListener('click', () => {
     nearbyArea.classList.toggle('hidden');
     nearbyToggle.textContent = nearbyArea.classList.contains('hidden')
@@ -868,6 +873,53 @@
     nearbyStatus.classList.add('hidden');
   }
 
+  // ===== Location Search (Nominatim geocoder) =====
+  searchLocationBtn.addEventListener('click', () => {
+    const query = locationInput.value.trim();
+    if (!query) return;
+    geocodeAndSearch(query);
+  });
+
+  locationInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const query = locationInput.value.trim();
+      if (query) geocodeAndSearch(query);
+    }
+  });
+
+  async function geocodeAndSearch(query) {
+    setNearbyStatus('Finding location...');
+    searchLocationBtn.disabled = true;
+    locateBtn.disabled = true;
+
+    try {
+      const resp = await fetch(
+        `${NOMINATIM_URL}?q=${encodeURIComponent(query)}&format=json&limit=1`,
+        { headers: { 'Accept': 'application/json' } }
+      );
+      const results = await resp.json();
+
+      if (!results.length) {
+        setNearbyStatus('Location not found. Try a different search.', true);
+        searchLocationBtn.disabled = false;
+        locateBtn.disabled = false;
+        return;
+      }
+
+      const lat = parseFloat(results[0].lat);
+      const lng = parseFloat(results[0].lon);
+      const displayName = results[0].display_name.split(',').slice(0, 2).join(',');
+      setNearbyStatus(`Searching near ${displayName}...`);
+      searchNearbyPlaces(lat, lng);
+    } catch (err) {
+      console.error('Geocoding error:', err);
+      setNearbyStatus('Location search failed. Try again.', true);
+      searchLocationBtn.disabled = false;
+      locateBtn.disabled = false;
+    }
+  }
+
+  // ===== Geolocation (browser) =====
   locateBtn.addEventListener('click', () => {
     if (!('geolocation' in navigator)) {
       setNearbyStatus('Geolocation not supported by your browser.', true);
@@ -932,6 +984,7 @@ out center body qt ${limit};`;
           .slice(0, limit);
 
         locateBtn.disabled = false;
+        searchLocationBtn.disabled = false;
 
         if (places.length === 0) {
           setNearbyStatus(`No ${placeType.options[placeType.selectedIndex].text.toLowerCase()} found nearby. Try a larger radius.`, true);
@@ -952,6 +1005,7 @@ out center body qt ${limit};`;
 
     // All mirrors failed
     locateBtn.disabled = false;
+    searchLocationBtn.disabled = false;
     console.error('All Overpass mirrors failed:', lastErr);
     setNearbyStatus('All servers busy. Please try again in a moment.', true);
   }

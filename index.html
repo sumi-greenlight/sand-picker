@@ -76,8 +76,12 @@
             <option value="50">Top 50</option>
           </select>
         </div>
-        <button id="locateBtn" class="glass-btn primary small locate-btn">
-          <span class="locate-icon">&#9737;</span> Use my location
+        <div class="location-input-group">
+          <input type="text" id="locationInput" class="glass-input" placeholder="City or address..." autocomplete="off">
+          <button id="searchLocationBtn" class="glass-btn primary small">Search</button>
+        </div>
+        <button id="locateBtn" class="glass-btn secondary small locate-btn">
+          <span class="locate-icon">&#9737;</span> Or use my location
         </button>
         <p id="nearbyStatus" class="nearby-status hidden"></p>
         <ul id="nearbyResults" class="nearby-results hidden"></ul>
