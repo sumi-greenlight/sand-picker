@@ -950,15 +950,21 @@
 
   async function searchNearbyPlaces(lat, lng) {
     const type = placeType.value;
-    const radius = placeRadius.value;
+    const radiusM = parseInt(placeRadius.value, 10);
     const limit = parseInt(placeLimit.value, 10);
 
-    const query = `[out:json][timeout:15];
-(
-  node(around:${radius},${lat},${lng})["amenity"="${type}"]["name"];
-  way(around:${radius},${lat},${lng})["amenity"="${type}"]["name"];
-);
-out center body qt ${limit};`;
+    // Convert radius to bounding box (much faster than "around" for large areas)
+    const latDeg = radiusM / 111320;
+    const lngDeg = radiusM / (111320 * Math.cos(lat * Math.PI / 180));
+    const south = (lat - latDeg).toFixed(6);
+    const north = (lat + latDeg).toFixed(6);
+    const west = (lng - lngDeg).toFixed(6);
+    const east = (lng + lngDeg).toFixed(6);
+    const bbox = `${south},${west},${north},${east}`;
+
+    const query = `[out:json][timeout:30];
+node["amenity"="${type}"]["name"](${bbox});
+out qt ${limit};`;
 
     let lastErr = null;
 
