@@ -675,7 +675,7 @@
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)';
-    ctx.fillText(text, W / 2, H - 70);
+    ctx.fillText(text, W / 2, H * 0.15);
     ctx.restore();
   }
 
