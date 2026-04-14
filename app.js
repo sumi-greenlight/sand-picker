@@ -845,7 +845,12 @@
   const placeRadius = document.getElementById('placeRadius');
   const placeLimit = document.getElementById('placeLimit');
 
-  const OVERPASS_URL = 'https://overpass-api.de/api/interpreter';
+  // Multiple Overpass mirrors — try in order, fallback on failure
+  const OVERPASS_MIRRORS = [
+    'https://overpass.kumi.systems/api/interpreter',
+    'https://overpass-api.de/api/interpreter',
+    'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
+  ];
 
   nearbyToggle.addEventListener('click', () => {
     nearbyArea.classList.toggle('hidden');
@@ -896,44 +901,59 @@
     const radius = placeRadius.value;
     const limit = parseInt(placeLimit.value, 10);
 
-    const query = `[out:json][timeout:10];
+    const query = `[out:json][timeout:15];
 (
   node(around:${radius},${lat},${lng})["amenity"="${type}"]["name"];
   way(around:${radius},${lat},${lng})["amenity"="${type}"]["name"];
 );
 out center body qt ${limit};`;
 
-    try {
-      const resp = await fetch(OVERPASS_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'data=' + encodeURIComponent(query),
-      });
+    let lastErr = null;
 
-      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    for (const mirror of OVERPASS_MIRRORS) {
+      try {
+        setNearbyStatus(`Searching nearby places...`);
+        const resp = await fetch(mirror, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: 'data=' + encodeURIComponent(query),
+        });
 
-      const data = await resp.json();
-      const places = (data.elements || [])
-        .map(el => el.tags?.name)
-        .filter(Boolean)
-        .slice(0, limit);
+        // Check if response is JSON (not an HTML error page)
+        const text = await resp.text();
+        if (text.includes('<!DOCTYPE') || text.includes('<html')) {
+          throw new Error('Server returned HTML error');
+        }
 
-      locateBtn.disabled = false;
+        const data = JSON.parse(text);
+        const places = (data.elements || [])
+          .map(el => el.tags?.name)
+          .filter(Boolean)
+          .slice(0, limit);
 
-      if (places.length === 0) {
-        setNearbyStatus(`No ${placeType.options[placeType.selectedIndex].text.toLowerCase()} found nearby. Try a larger radius.`, true);
-        nearbyResults.classList.add('hidden');
-        addAllNearby.classList.add('hidden');
-        return;
+        locateBtn.disabled = false;
+
+        if (places.length === 0) {
+          setNearbyStatus(`No ${placeType.options[placeType.selectedIndex].text.toLowerCase()} found nearby. Try a larger radius.`, true);
+          nearbyResults.classList.add('hidden');
+          addAllNearby.classList.add('hidden');
+          return;
+        }
+
+        setNearbyStatus(`Found ${places.length} places`);
+        renderNearbyResults(places);
+        return; // success — stop trying mirrors
+      } catch (err) {
+        lastErr = err;
+        console.warn(`Overpass mirror failed (${mirror}):`, err.message);
+        continue; // try next mirror
       }
-
-      setNearbyStatus(`Found ${places.length} places`);
-      renderNearbyResults(places);
-    } catch (err) {
-      locateBtn.disabled = false;
-      console.error('Overpass error:', err);
-      setNearbyStatus('Search failed. Try again in a moment.', true);
     }
+
+    // All mirrors failed
+    locateBtn.disabled = false;
+    console.error('All Overpass mirrors failed:', lastErr);
+    setNearbyStatus('All servers busy. Please try again in a moment.', true);
   }
 
   function renderNearbyResults(places) {
